@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strconv"
+    "crypto/tls"
 )
 
 type HttpEventReader struct {
@@ -19,7 +20,10 @@ type HttpEventReader struct {
 
 func (eventReader *HttpEventReader) ReadEvents(camera *HikCamera, channel chan<- HikEvent, callback func()) {
 	if eventReader.client == nil {
-		eventReader.client = &http.Client{}
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		eventReader.client = &http.Client{Transport: tr}
 		if camera.AuthMethod == Digest {
 			eventReader.client.Transport = &digest.Transport{
 				Username: camera.Username,

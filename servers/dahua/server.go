@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+    "crypto/tls"
 )
 
 type DhCamera struct {
@@ -176,7 +177,10 @@ func (server *Server) addCamera(waitGroup *sync.WaitGroup, cam *DhCamera, channe
 	}
 
 	if cam.client == nil {
-		cam.client = &http.Client{}
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		cam.client = &http.Client{Transport: tr}
 	}
 
 	// PROBE AUTH

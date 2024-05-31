@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+    "crypto/tls"
 )
 
 type HttpAuthMethod int
@@ -70,7 +71,10 @@ func (server *Server) addCamera(waitGroup *sync.WaitGroup, camera *HikCamera, ev
 	}
 
 	// PROBE AUTH
-	client := &http.Client{}
+	tr := &http.Transport{
+        TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+    }
+	client := &http.Client{Transport: tr}
 	request, err := http.NewRequest("GET", camera.Url+"System/status", nil)
 	if err != nil {
 		fmt.Printf("HIK: Error probing auth method for camera %s\n", camera.Name)
